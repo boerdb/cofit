@@ -1,5 +1,11 @@
-const CACHE = "cofit-ganzenbord-v1";
-const PRECACHE = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
+/* Minimal SW: installability without breaking Next.js navigations. */
+const CACHE = "cofit-static-v2";
+const PRECACHE = [
+  "/manifest.webmanifest",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -25,38 +31,29 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
 
-  // Navigaties altijd via netwerk eerst, zodat Next.js updates niet vastzitten.
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match("/"))),
-    );
+  // HTML / navigaties: altijd netwerk. Geen cache — voorkomt blanke Android-launch.
+  if (request.mode === "navigate" || request.destination === "document") {
+    return;
+  }
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Alleen eigen static assets cachen (icons/manifest).
+  if (!url.pathname.startsWith("/icons/") && url.pathname !== "/manifest.webmanifest") {
     return;
   }
 
   event.respondWith(
     caches.match(request).then((cached) => {
-      const fetched = fetch(request)
-        .then((response) => {
-          if (response && response.status === 200 && response.type === "basic") {
-            const clone = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || fetched;
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, clone));
+        }
+        return response;
+      });
     }),
   );
-});
-
-self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
 });

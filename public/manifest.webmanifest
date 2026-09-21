@@ -1,12 +1,14 @@
 {
+  "id": "/",
   "name": "COFIT-2020 Ganzenbord",
   "short_name": "COFIT",
   "description": "Beweegspel voor Fysio Harlingen — gooi, beweeg en doe de oefeningen.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#d5e4c8",
   "theme_color": "#c5d4b8",
-  "orientation": "landscape",
+  "orientation": "any",
   "lang": "nl",
   "icons": [
     {
