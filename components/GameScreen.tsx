@@ -37,8 +37,8 @@ export function GameScreen() {
         <img
           src="/logo-fysioharlingen.png"
           alt="Fysiotherapie en Training"
-          width={160}
-          height={63}
+          width={78}
+          height={31}
         />
         <span>© 2026 V0.1</span>
       </div>
