@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COFIT-2020 Ganzenbord</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --bg: #f7fcf9;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #0d9669;
+    --accent-soft: rgba(13,150,105,.14);
+    --accent2: #d4724a;
+    --accent2-soft: rgba(212,114,74,.14);
+    --border: rgba(15,23,42,.08);
+    --yellow: #e8f560;
+    --yellow-dark: #c8d930;
+    --gray-special: #b8b8b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Nunito", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .tile {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 2px solid #333;
+    font-weight: 700;
+    text-align: center;
+    transition: all .2s ease;
+    font-size: 10px;
+    line-height: 1.1;
+    padding: 2px;
+    overflow: hidden;
+  }
+  .tile-yellow { background: var(--yellow); }
+  .tile-gray { background: var(--gray-special); color: #222; }
+  .tile-white { background: #fff; }
+  .tile-start { background: var(--accent); color: #fff; font-size: 16px; }
+  .tile-current {
+    box-shadow: 0 0 0 3px var(--accent2), 0 0 15px rgba(212,114,74,.4);
+    transform: scale(1.05);
+    z-index: 10;
+  }
+  .pawn {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff6b6b, #c92a2a);
+    border: 3px solid #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+    z-index: 20;
+    transition: left .5s cubic-bezier(.4,0,.2,1), top .5s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+  .pawn::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.6);
+  }
+  .dice {
+    width: 80px;
+    height: 80px;
+    background: #fff;
+    border: 3px solid #333;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .15s ease;
+    user-select: none;
+    position: relative;
+  }
+  .dice:hover { transform: scale(1.05); }
+  .dice:active { transform: scale(.95); }
+  .dice.rolling { animation: shake .5s ease infinite; }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+  .dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #222;
+  }
+  .btn-primary {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--text);
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    transition: all .15s ease;
+  }
+  .btn-primary:hover { background: var(--accent); color: #fff; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-secondary {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    background: var(--card);
+    color: var(--muted);
+    border: 2px solid var(--border);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    transition: all .15s ease;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+  .msg-box {
+    min-height: 60px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .msg-box.exercise { border-color: var(--yellow-dark); background: #fefce8; }
+  .msg-box.special { border-color: var(--accent2); background: var(--accent2-soft); }
+  .msg-box.win { border-color: var(--accent); background: var(--accent-soft); font-size: 18px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid #333;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div class="max-w-6xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="text-center mb-6">
+    <h1 class="text-3xl md:text-4xl font-extrabold mb-1" style="color:var(--accent);letter-spacing:-.02em">COFIT-2020 Ganzenbord</h1>
+    <p class="text-sm" style="color:var(--muted)">Gooi de dobbelsteen, beweeg je pion en doe de oefeningen! Bij vakje 62 ben je gewonnen.</p>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+
+    <!-- Board -->
+    <div class="flex-1">
+      <div id="board" style="position:relative;width:100%;max-width:720px;margin:0 auto;aspect-ratio:4/3;background:var(--card);border:3px solid #333;border-radius:20px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.08);">
+        <!-- Center label -->
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:1;pointer-events:none">
+          <div style="font-size:22px;font-weight:800;color:var(--accent)">COFIT-2020</div>
+          <div style="font-size:14px;font-weight:700;color:#333">GANZENBORD</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;max-width:200px">Fysio Harlingen</div>
+        </div>
+        <div id="pawn" class="pawn"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="lg:w-80 flex flex-col gap-4">
+
+      <!-- Dice -->
+      <div class="rounded-2xl p-5" style="background:var(--card);border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="text-xs uppercase tracking-wider font-bold mb-3" style="color:var(--muted)">Dobbelsteen</div>
+        <div class="flex items-center justify-center mb-4">
+          <div id="dice" class="dice" onclick="rollDice()"></div>
+        </div>
+        <div class="flex gap-2 justify-center">
+          <button id="rollBtn" class="btn-primary" onclick="rollDice()">Gooien!</button>
+          <button class="btn-secondary" onclick="resetGame()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="rounded-2xl p-5" style="background:var(--card);border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="text-xs uppercase tracking-wider font-bold mb-3" style="color:var(--muted)">Status</div>
+        <div class="flex items-center justify-between mb-3">
+          <span style="color:var(--muted);font-size:14px">Huidige vakje:</span>
+          <span id="currentTile" class="font-extrabold text-lg" style="color:var(--accent)">START</span>
+        </div>
+        <div class="flex items-center justify-between mb-3">
+          <span style="color:var(--muted);font-size:14px">Aantal worpen:</span>
+          <span id="rollCount" class="font-extrabold text-lg" style="color:var(--text)">0</span>
+        </div>
+        <div id="messageBox" class="msg-box">
+          Klik op <strong>Gooien!</strong> om te beginnen.
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="rounded-2xl p-5" style="background:var(--card);border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="text-xs uppercase tracking-wider font-bold mb-3" style="color:var(--muted)">Legenda</div>
+        <div class="flex flex-col gap-2">
+          <div class="legend-item"><div class="legend-box" style="background:var(--yellow)"></div><span>Oefening — uitvoeren</span></div>
+          <div class="legend-item"><div class="legend-box" style="background:var(--gray-special)"></div><span>Speciaal — speciale regel</span></div>
+          <div class="legend-item"><div class="legend-box" style="background:#fff"></div><span>Opdracht — voor jou of een ander</span></div>
+          <div class="legend-item"><div class="legend-box" style="background:var(--accent)"></div><span>Start — hier begin je</span></div>
+        </div>
+      </div>
+
+      <!-- Special rules summary -->
+      <div class="rounded-2xl p-5" style="background:var(--card);border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="text-xs uppercase tracking-wider font-bold mb-3" style="color:var(--muted)">Speciale vakjes</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text)">
+          <strong>6</strong>: 2 plaatsen terug<br>
+          <strong>9</strong>: 1 plaats vooruit<br>
+          <strong>14</strong>: 2 plaatsen vooruit<br>
+          <strong>18</strong>: Ga naar vakje 22<br>
+          <strong>22</strong>: 1 beurt overslaan<br>
+          <strong>27</strong>: 2 plaatsen terug<br>
+          <strong>32</strong>: 1 plaats vooruit<br>
+          <strong>36</strong>: Nogmaals gooien<br>
+          <strong>40</strong>: Ga terug naar 30<br>
+          <strong>45</strong>: Terug naar start!<br>
+          <strong>50</strong>: 1 plaats vooruit<br>
+          <strong>52</strong>: Nogmaals gooien<br>
+          <strong>58</strong>: 1 beurt overslaan<br>
+          <strong>59</strong>: 4 plaatsen terug<br>
+          <strong>62</strong>: Eind — je hebt gewonnen!
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Board tiles definition: 0 = START, 1-62 = play tiles
+  var tiles = [
+    {num:0,type:'start',text:'START',rule:null},
+    {num:1,type:'special',text:'',rule:null},
+    {num:2,type:'exercise',text:'10x opdrukken',rule:null},
+    {num:3,type:'exercise',text:'50x knieheffen staand',rule:null},
+    {num:4,type:'exercise',text:'20 rechte sit-ups',rule:null},
+    {num:5,type:'exercise',text:'20x springen op 2 voeten',rule:null},
+    {num:6,type:'special',text:'',rule:{action:'back',value:2,msg:'2 plaatsen terug!'}},
+    {num:7,type:'exercise',text:'1 min. appels plukken',rule:null},
+    {num:8,type:'task',text:'Verzin een opdracht voor een ander',rule:null},
+    {num:9,type:'special',text:'',rule:{action:'forward',value:1,msg:'1 plaats vooruit!'}},
+    {num:10,type:'exercise',text:'30 sec. muurzit',rule:null},
+    {num:11,type:'exercise',text:'1 min. rennen op de plaats',rule:null},
+    {num:12,type:'task',text:'20x zolang mogenlijk muurzit',rule:null},
+    {num:13,type:'exercise',text:'30 sec. balanceren op 1 been',rule:null},
+    {num:14,type:'special',text:'',rule:{action:'forward',value:2,msg:'2 plaatsen vooruit!'}},
+    {num:15,type:'exercise',text:'1 min. lucht-zwemmen met de armen',rule:null},
+    {num:16,type:'task',text:'1 min. rennen op de plaats',rule:null},
+    {num:17,type:'exercise',text:'15x springen + grond aanraken',rule:null},
+    {num:18,type:'special',text:'',rule:{action:'goto',value:22,msg:'Ga direct naar vakje 22!'}},
+    {num:19,type:'task',text:'45 sec. muurzit',rule:null},
+    {num:20,type:'exercise',text:'10x squatten',rule:null},
+    {num:21,type:'exercise',text:'20x opdrukken tegen de muur',rule:null},
+    {num:22,type:'special',text:'',rule:{action:'skip',value:1,msg:'1 beurt overslaan!'}},
+    {num:23,type:'exercise',text:'15x springen + grond aanraken',rule:null},
+    {num:24,type:'exercise',text:'30 sec. planken, daarna 10x squats',rule:null},
+    {num:25,type:'task',text:'Loop naar de brievenbus en terug',rule:null},
+    {num:26,type:'task',text:'20x opdrukken tegen de muur',rule:null},
+    {num:27,type:'special',text:'',rule:{action:'back',value:2,msg:'2 plaatsen terug!'}},
+    {num:28,type:'exercise',text:'1 min. rennen op de plaats',rule:null},
+    {num:29,type:'exercise',text:'1 min. rondjes draaien met de armen',rule:null},
+    {num:30,type:'exercise',text:'30 sec. planken',rule:null},
+    {num:31,type:'task',text:'1x rondje om het huis heen lopen',rule:null},
+    {num:32,type:'special',text:'',rule:{action:'forward',value:1,msg:'1 plaats vooruit!'}},
+    {num:33,type:'task',text:'3x de trap op en neer',rule:null},
+    {num:34,type:'exercise',text:'Boksen in de lucht',rule:null},
+    {num:35,type:'exercise',text:'Stap opzij en terug',rule:null},
+    {num:36,type:'special',text:'',rule:{action:'reroll',value:0,msg:'Nogmaals gooien!'}},
+    {num:37,type:'exercise',text:'10x squatten',rule:null},
+    {num:38,type:'exercise',text:'20x opdrukken tegen de muur',rule:null},
+    {num:39,type:'task',text:'50x boksen',rule:null},
+    {num:40,type:'special',text:'',rule:{action:'goto',value:30,msg:'Ga terug naar vakje 30!'}},
+    {num:41,type:'task',text:'20x sit-ups',rule:null},
+    {num:42,type:'task',text:'20x opstaan en zitten',rule:null},
+    {num:43,type:'task',text:'10x grond aantikken',rule:null},
+    {num:44,type:'exercise',text:'30 sec. muurzit',rule:null},
+    {num:45,type:'special',text:'',rule:{action:'goto',value:0,msg:'Helaas! Terug naar START!'}},
+    {num:46,type:'task',text:'20x klappen boven het hoofd',rule:null},
+    {num:47,type:'task',text:'Loop snel naar de voordeur en terug',rule:null},
+    {num:48,type:'exercise',text:'1 min. touwtje springen',rule:null},
+    {num:49,type:'task',text:'30 sec. op 1 been staan',rule:null},
+    {num:50,type:'special',text:'',rule:{action:'forward',value:1,msg:'1 plaats vooruit!'}},
+    {num:51,type:'exercise',text:'10x hinkelen',rule:null},
+    {num:52,type:'special',text:'',rule:{action:'reroll',value:0,msg:'Nogmaals gooien!'}},
+    {num:53,type:'exercise',text:'1 min. rugliggend fietsen in de lucht',rule:null},
+    {num:54,type:'task',text:'Verzin een opdracht voor een ander',rule:null},
+    {num:55,type:'exercise',text:'10 meter op tenen lopen',rule:null},
+    {num:56,type:'task',text:'3x de trap op en neer',rule:null},
+    {num:57,type:'exercise',text:'Boksen in de lucht',rule:null},
+    {num:58,type:'special',text:'',rule:{action:'skip',value:1,msg:'1 beurt overslaan!'}},
+    {num:59,type:'special',text:'',rule:{action:'back',value:4,msg:'4 plaatsen terug!'}},
+    {num:60,type:'task',text:'Naar voren uitvalspas en terug',rule:null},
+    {num:61,type:'task',text:'Een ander verzin een opdracht voor jou',rule:null},
+    {num:62,type:'special',text:'EIND!',rule:{action:'win',value:0,msg:'Gefeliciteerd! Je hebt gewonnen!'}}
+  ];
+
+  // Game state
+  var state = {
+    position: 0,
+    rollCount: 0,
+    skipTurn: false,
+    gameOver: false,
+    rolling: false,
+    tilePositions: []
+  };
+
+  // Dice faces using dots
+  var diceFaces = {
+    1: [[50,50]],
+    2: [[25,25],[75,75]],
+    3: [[25,25],[50,50],[75,75]],
+    4: [[25,25],[25,75],[75,25],[75,75]],
+    5: [[25,25],[25,75],[50,50],[75,25],[75,75]],
+    6: [[25,20],[25,50],[25,80],[75,20],[75,50],[75,80]]
+  };
+
+  function renderDice(value) {
+    var dice = document.getElementById('dice');
+    dice.innerHTML = '';
+    var dots = diceFaces[value];
+    dots.forEach(function(d){
+      var dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.left = 'calc(' + d[0] + '% - 6px)';
+      dot.style.top = 'calc(' + d[1] + '% - 6px)';
+      dice.appendChild(dot);
+    });
+  }
+
+  // Generate positions along a rounded rectangle path
+  function generateSpiralPositions() {
+    var board = document.getElementById('board');
+    var w = board.clientWidth - 40;
+    var h = board.clientHeight - 40;
+    var positions = [];
+    var totalTiles = 63;
+    var cx = w / 2;
+    var cy = h / 2;
+    var rx = w * 0.42;
+    var ry = h * 0.38;
+    var cr = Math.min(rx, ry) * 0.25;
+
+    function getPointOnRoundedRect(t) {
+      var topLen = 2 * (rx - cr);
+      var rightLen = 2 * (ry - cr);
+      var bottomLen = 2 * (rx - cr);
+      var leftLen = 2 * (ry - cr);
+      var cornerLen = Math.PI * cr / 2;
+      var totalLen = topLen + cornerLen + rightLen + cornerLen + bottomLen + cornerLen + leftLen + cornerLen;
+      var dist = t * totalLen;
+
+      var segments = [
+        {len: topLen, type:'top'},
+        {len: cornerLen, type:'corner-tr'},
+        {len: rightLen, type:'right'},
+        {len: cornerLen, type:'corner-br'},
+        {len: bottomLen, type:'bottom'},
+        {len: cornerLen, type:'corner-bl'},
+        {len: leftLen, type:'left'},
+        {len: cornerLen, type:'corner-tl'}
+      ];
+
+      var accumulated = 0;
+      for (var i = 0; i < segments.length; i++) {
+        var seg = segments[i];
+        if (dist <= accumulated + seg.len) {
+          var localT = (dist - accumulated) / seg.len;
+          switch(seg.type) {
+            case 'top':
+              return {x: cx - rx + cr + localT * topLen, y: cy - ry};
+            case 'right':
+              return {x: cx + rx, y: cy - ry + cr + localT * rightLen};
+            case 'bottom':
+              return {x: cx + rx - cr - localT * bottomLen, y: cy + ry};
+            case 'left':
+              return {x: cx - rx, y: cy + ry - cr - localT * leftLen};
+            case 'corner-tr':
+              var a = -Math.PI/2 + localT * Math.PI/2;
+              return {x: cx + rx - cr + Math.cos(a) * cr, y: cy - ry + cr + Math.sin(a) * cr};
+            case 'corner-br':
+              var a = 0 + localT * Math.PI/2;
+              return {x: cx + rx - cr + Math.cos(a) * cr, y: cy + ry - cr + Math.sin(a) * cr};
+            case 'corner-bl':
+              var a = Math.PI/2 + localT * Math.PI/2;
+              return {x: cx - rx + cr + Math.cos(a) * cr, y: cy + ry - cr + Math.sin(a) * cr};
+            case 'corner-tl':
+              var a = Math.PI + localT * Math.PI/2;
+              return {x: cx - rx + cr + Math.cos(a) * cr, y: cy - ry + cr + Math.sin(a) * cr};
+          }
+        }
+        accumulated += seg.len;
+      }
+      return {x: cx, y: cy};
+    }
+
+    var shift = 0.5; // start at bottom
+    for (var i = 0; i < totalTiles; i++) {
+      var t = ((i / totalTiles) + shift) % 1;
+      var p = getPointOnRoundedRect(t);
+      positions.push({x: p.x + 20, y: p.y + 20});
+    }
+    return positions;
+  }
+
+  function renderBoard() {
+    var board = document.getElementById('board');
+    var positions = generateSpiralPositions();
+    state.tilePositions = positions;
+
+    var existingTiles = board.querySelectorAll('.tile');
+    existingTiles.forEach(function(t){ t.remove(); });
+
+    var tileW = 56;
+    var tileH = 56;
+
+    tiles.forEach(function(tile, i) {
+      var pos = positions[i];
+      var el = document.createElement('div');
+      el.className = 'tile tile-' + tile.type;
+      el.id = 'tile-' + i;
+      el.style.left = (pos.x - tileW/2) + 'px';
+      el.style.top = (pos.y - tileH/2) + 'px';
+      el.style.width = tileW + 'px';
+      el.style.height = tileH + 'px';
+
+      if (tile.type === 'start') {
+        el.innerHTML = '<span style="font-size:14px;font-weight:800">START</span>';
+      } else if (tile.type === 'special') {
+        el.innerHTML = '<span style="font-size:20px;font-weight:800;color:#222">' + tile.num + '</span>';
+        if (tile.text) {
+          el.innerHTML += '<span style="font-size:8px;margin-top:2px">' + tile.text + '</span>';
+        }
+      } else {
+        el.innerHTML = '<span style="font-size:9px;line-height:1.1;padding:0 2px">' + tile.text + '</span>';
+      }
+
+      el.title = 'Vakje ' + tile.num + (tile.text ? ': ' + tile.text : '');
+      board.appendChild(el);
+    });
+
+    updatePawnPosition();
+  }
+
+  function updatePawnPosition() {
+    var pawn = document.getElementById('pawn');
+    var pos = state.tilePositions[state.position];
+    if (!pos) return;
+
+    pawn.style.left = (pos.x - 14) + 'px';
+    pawn.style.top = (pos.y - 14) + 'px';
+
+    document.querySelectorAll('.tile').forEach(function(t){
+      t.classList.remove('tile-current');
+    });
+    var currentTile = document.getElementById('tile-' + state.position);
+    if (currentTile) {
+      currentTile.classList.add('tile-current');
+    }
+
+    document.getElementById('currentTile').textContent = state.position === 0 ? 'START' : state.position;
+    document.getElementById('rollCount').textContent = state.rollCount;
+  }
+
+  function showMessage(text, type) {
+    var box = document.getElementById('messageBox');
+    box.textContent = text;
+    box.className = 'msg-box';
+    if (type) box.classList.add(type);
+  }
+
+  function processTile(tileNum, fromRoll) {
+    var tile = tiles[tileNum];
+    updatePawnPosition();
+
+    if (tile.type === 'exercise') {
+      showMessage('Oefening: ' + tile.text, 'exercise');
+      state.rolling = false;
+      document.getElementById('rollBtn').disabled = false;
+      document.getElementById('dice').classList.remove('rolling');
+    } else if (tile.type === 'task') {
+      showMessage('Opdracht: ' + tile.text, 'exercise');
+      state.rolling = false;
+      document.getElementById('rollBtn').disabled = false;
+      document.getElementById('dice').classList.remove('rolling');
+    } else if (tile.type === 'special' && tile.rule) {
+      var rule = tile.rule;
+      setTimeout(function() {
+        switch(rule.action) {
+          case 'back':
+            state.position = Math.max(0, state.position - rule.value);
+            showMessage('Vakje ' + tile.num + ': ' + rule.msg, 'special');
+            setTimeout(function(){ processTile(state.position, false); }, 600);
+            break;
+          case 'forward':
+            state.position = Math.min(62, state.position + rule.value);
+            showMessage('Vakje ' + tile.num + ': ' + rule.msg, 'special');
+            setTimeout(function(){ processTile(state.position, false); }, 600);
+            break;
+          case 'goto':
+            state.position = rule.value;
+            showMessage('Vakje ' + tile.num + ': ' + rule.msg, 'special');
+            setTimeout(function(){ processTile(state.position, false); }, 600);
+            break;
+          case 'skip':
+            state.skipTurn = true;
+            showMessage('Vakje ' + tile.num + ': ' + rule.msg, 'special');
+            state.rolling = false;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('dice').classList.remove('rolling');
+            break;
+          case 'reroll':
+            showMessage('Vakje ' + tile.num + ': ' + rule.msg, 'special');
+            state.rolling = false;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('dice').classList.remove('rolling');
+            break;
+          case 'win':
+            state.gameOver = true;
+            showMessage(rule.msg + ' Je deed er ' + state.rollCount + ' worpen over!', 'win');
+            state.rolling = false;
+            document.getElementById('rollBtn').disabled = true;
+            document.getElementById('dice').classList.remove('rolling');
+            break;
+          default:
+            state.rolling = false;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('dice').classList.remove('rolling');
+        }
+      }, 500);
+    } else {
+      state.rolling = false;
+      document.getElementById('rollBtn').disabled = false;
+      document.getElementById('dice').classList.remove('rolling');
+    }
+  }
+
+  window.rollDice = function() {
+    if (state.rolling || state.gameOver) return;
+
+    state.rolling = true;
+    document.getElementById('rollBtn').disabled = true;
+    document.getElementById('dice').classList.add('rolling');
+
+    if (state.skipTurn) {
+      state.skipTurn = false;
+      state.rollCount++;
+      showMessage('Beurt overgeslagen. Nu mag je weer gooien!', 'special');
+      setTimeout(function() {
+        state.rolling = false;
+        document.getElementById('rollBtn').disabled = false;
+        document.getElementById('dice').classList.remove('rolling');
+      }, 1200);
+      return;
+    }
+
+    var rollAnim = 0;
+    var animInterval = setInterval(function() {
+      renderDice(Math.floor(Math.random() * 6) + 1);
+      rollAnim++;
+      if (rollAnim >= 10) {
+        clearInterval(animInterval);
+        var value = Math.floor(Math.random() * 6) + 1;
+        renderDice(value);
+        state.rollCount++;
+
+        var newPos = state.position + value;
+        if (newPos > 62) {
+          newPos = 62 - (newPos - 62);
+          showMessage('Je gooit ' + value + '. Voorbij het eind! Je stuitert terug.', 'special');
+        } else {
+          showMessage('Je gooit ' + value + '!', '');
+        }
+
+        state.position = newPos;
+        setTimeout(function(){ processTile(state.position, true); }, 400);
+      }
+    }, 80);
+  };
+
+  window.resetGame = function() {
+    state.position = 0;
+    state.rollCount = 0;
+    state.skipTurn = false;
+    state.gameOver = false;
+    state.rolling = false;
+    renderDice(1);
+    updatePawnPosition();
+    showMessage('Spel gereset. Klik op Gooien! om opnieuw te beginnen.', '');
+    document.getElementById('rollBtn').disabled = false;
+    document.getElementById('dice').classList.remove('rolling');
+  };
+
+  // Initialize
+  renderDice(1);
+  renderBoard();
+
+  window.addEventListener('resize', function() {
+    renderBoard();
+  });
+})();
+</script>
+</body>
+</html>
