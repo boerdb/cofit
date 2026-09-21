@@ -2,6 +2,7 @@
 
 import { Board } from "@/components/Board";
 import { GamePanel } from "@/components/GamePanel";
+import { PhoneGate } from "@/components/PhoneGate";
 import { useGame } from "@/lib/use-game";
 
 export function GameScreen() {
@@ -38,6 +39,8 @@ export function GameScreen() {
           <p>Dit ganzenbord is gemaakt voor landscape.</p>
         </div>
       </div>
+
+      <PhoneGate />
     </main>
   );
 }

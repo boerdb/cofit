@@ -19,3 +19,12 @@ export function isAndroidDevice(): boolean {
   if (typeof navigator === "undefined") return false;
   return /Android/i.test(navigator.userAgent);
 }
+
+/** Telefoon (geen tablet). Android-tablets hebben meestal geen "Mobile" in de UA. */
+export function isPhoneDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  if (/iPhone|iPod/.test(ua)) return true;
+  if (/Android/i.test(ua) && /Mobile/i.test(ua)) return true;
+  return false;
+}

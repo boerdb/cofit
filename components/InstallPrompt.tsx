@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isAndroidDevice, isIosDevice, isStandaloneMode } from "@/lib/pwa";
+import { isAndroidDevice, isIosDevice, isPhoneDevice, isStandaloneMode } from "@/lib/pwa";
 
 const DISMISS_KEY = "cofit-install-dismissed";
 
@@ -35,6 +35,7 @@ export function InstallPrompt() {
     }
 
     if (isStandaloneMode()) return;
+    if (isPhoneDevice()) return;
     if (localStorage.getItem(DISMISS_KEY) === "1") return;
 
     const onBeforeInstall = (event: Event) => {
