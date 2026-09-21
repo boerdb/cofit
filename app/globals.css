@@ -37,24 +37,29 @@ body {
   z-index: 15;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  opacity: 0.42;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 8px 5px;
+  border-radius: 12px;
+  background: #0a0a0a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  opacity: 0.92;
   pointer-events: none;
   user-select: none;
 }
 
 .brand-credit img {
-  width: 108px;
+  width: 148px;
   height: auto;
   display: block;
+  border-radius: 6px;
 }
 
 .brand-credit span {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #5b564c;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .board-frame {
