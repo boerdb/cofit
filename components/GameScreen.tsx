@@ -32,6 +32,17 @@ export function GameScreen() {
         </Board>
       </div>
 
+      <div className="brand-credit" aria-label="Fysiotherapie en Training">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-fysioharlingen.png"
+          alt="Fysiotherapie en Training"
+          width={118}
+          height={46}
+        />
+        <span>(C) 2026 V0.1</span>
+      </div>
+
       <div className="rotate-hint">
         <div className="rotate-card">
           <div className="text-4xl">↻</div>
