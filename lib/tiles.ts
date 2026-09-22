@@ -197,6 +197,15 @@ export const TILES: Tile[] = [
 
 export const LAST_TILE = 62;
 
+/** Seconds named on the square, such as "30 sec." or "1 min.". */
+export function durationSeconds(tile: Tile): number | null {
+  const minutes = tile.text.match(/(\d+)\s*min/i);
+  if (minutes) return Number(minutes[1]) * 60;
+  const seconds = tile.text.match(/(\d+)\s*sec/i);
+  if (seconds) return Number(seconds[1]);
+  return null;
+}
+
 export function wrapLabel(text: string, maxChars = 11): string[] {
   if (!text) return [];
   const words = text.split(/\s+/);

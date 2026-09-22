@@ -9,16 +9,18 @@ import {
   VIEW_W,
   pawnPosition,
 } from "@/lib/board-geometry";
+import { TurnClock } from "@/components/TurnClock";
 import { TILES, wrapLabel } from "@/lib/tiles";
 
 type Props = {
   position: number;
   inspected: number | null;
+  clockSeconds: number | null;
   onInspect: (index: number | null) => void;
   children: React.ReactNode;
 };
 
-export function Board({ position, inspected, onInspect, children }: Props) {
+export function Board({ position, inspected, clockSeconds, onInspect, children }: Props) {
   const pawn = pawnPosition(position);
 
   return (
@@ -142,6 +144,18 @@ export function Board({ position, inspected, onInspect, children }: Props) {
       >
         {children}
       </div>
+
+      {clockSeconds != null && (
+        <div
+          className="turn-clock-slot"
+          style={{
+            left: `${CENTER_BOX.left - 7.4}%`,
+            top: `${CENTER_BOX.top + 3.2}%`,
+          }}
+        >
+          <TurnClock key={position} seconds={clockSeconds} />
+        </div>
+      )}
     </div>
   );
 }

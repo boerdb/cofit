@@ -151,6 +151,65 @@ body {
   animation: dice-shake 0.45s ease infinite;
 }
 
+.turn-clock-slot {
+  position: absolute;
+  z-index: 15;
+  width: 6.6%;
+  pointer-events: auto;
+}
+
+.turn-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: clock-in 0.25s ease;
+}
+
+.turn-clock-face {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(1px 2px 0 #1c1c1c);
+}
+
+.turn-clock-time {
+  font-size: clamp(11px, 1.15vw, 16px);
+  font-weight: 800;
+  line-height: 1;
+  color: #161616;
+}
+
+.turn-clock-start {
+  width: 100%;
+  border-radius: 999px;
+  border: 2px solid #1c7a54;
+  background: #2fbe80;
+  color: #fff;
+  font: inherit;
+  font-size: clamp(9px, 0.85vw, 12px);
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.28em 0.2em;
+  cursor: pointer;
+}
+
+.turn-clock-start:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+@keyframes clock-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .phone-gate {
   position: fixed;
   inset: 0;

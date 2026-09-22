@@ -4,9 +4,12 @@ import { Board } from "@/components/Board";
 import { GamePanel } from "@/components/GamePanel";
 import { PhoneGate } from "@/components/PhoneGate";
 import { useGame } from "@/lib/use-game";
+import { durationSeconds } from "@/lib/tiles";
 
 export function GameScreen() {
   const game = useGame();
+  const clockSeconds =
+    game.rolling || game.gameOver ? null : durationSeconds(game.currentTile);
 
   return (
     <main className="game-shell">
@@ -14,6 +17,7 @@ export function GameScreen() {
         <Board
           position={game.position}
           inspected={game.inspected}
+          clockSeconds={clockSeconds}
           onInspect={game.inspect}
         >
           <GamePanel
@@ -40,7 +44,7 @@ export function GameScreen() {
           width={92}
           height={36}
         />
-        <span>© 2026 V0.1</span>
+        <span>© 2026 V 0.1.1</span>
       </div>
 
       <div className="rotate-hint">

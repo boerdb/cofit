@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { playDiceRoll, playLanding, stopSounds } from "./sounds";
 import { LAST_TILE, TILES, type Tile } from "./tiles";
 
 export type MessageKind = "info" | "exercise" | "task" | "special" | "win";
@@ -37,6 +38,7 @@ export function useGame() {
 
   const reset = useCallback(() => {
     gen.current += 1;
+    stopSounds();
     setPosition(0);
     setDice(1);
     setRollCount(0);
@@ -133,6 +135,7 @@ export function useGame() {
 
   const rollDice = useCallback(async () => {
     if (rolling || gameOver) return;
+    playDiceRoll();
     const myGen = gen.current;
     setRolling(true);
     setInspected(null);
@@ -176,6 +179,7 @@ export function useGame() {
     }
 
     if (gen.current !== myGen) return;
+    playLanding(value);
     await landOn(next, myGen);
   }, [gameOver, landOn, position, rolling, skipTurn]);
 
