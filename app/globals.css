@@ -38,28 +38,26 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 2px;
   padding: 0;
-  border-radius: 0;
   background: transparent;
-  box-shadow: none;
-  opacity: 0.62;
+  opacity: 0.78;
   pointer-events: none;
   user-select: none;
 }
 
 .brand-credit img {
-  width: 78px;
+  width: 92px;
   height: auto;
   display: block;
+  border-radius: 8px;
 }
 
 .brand-credit span {
-  margin-top: -1px;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(45, 58, 42, 0.7);
+  letter-spacing: 0.05em;
+  color: rgba(45, 58, 42, 0.65);
 }
 
 .board-frame {

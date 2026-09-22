@@ -35,10 +35,10 @@ export function GameScreen() {
       <div className="brand-credit" aria-label="Fysiotherapie en Training">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logo-fysioharlingen.png"
+          src="/logo-fysioharlingen.png?v=3"
           alt="Fysiotherapie en Training"
-          width={78}
-          height={31}
+          width={92}
+          height={36}
         />
         <span>© 2026 V0.1</span>
       </div>

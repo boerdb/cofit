@@ -1,5 +1,5 @@
 /* Minimal SW: installability without breaking Next.js navigations. */
-const CACHE = "cofit-static-v2";
+const CACHE = "cofit-static-v3";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/icons/icon-192.png",
