@@ -3,6 +3,7 @@
 import { Board } from "@/components/Board";
 import { GamePanel } from "@/components/GamePanel";
 import { PhoneGate } from "@/components/PhoneGate";
+import { WakeLock } from "@/components/WakeLock";
 import { useGame } from "@/lib/use-game";
 import { durationSeconds } from "@/lib/tiles";
 
@@ -56,6 +57,7 @@ export function GameScreen() {
       </div>
 
       <PhoneGate />
+      <WakeLock />
     </main>
   );
 }
